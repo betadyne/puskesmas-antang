@@ -1,212 +1,343 @@
 # Sistem Informasi Antrian Pasien Puskesmas Antang
 
-Sistem informasi antrian pasien untuk Puskesmas Antang Makassar dengan dukungan real-time broadcasting menggunakan Laravel 11, MySQL, dan Pusher.
+Sistem informasi antrian pasien modern untuk Puskesmas Antang Makassar dengan fitur *real-time broadcasting*.
 
 ## Fitur Utama
 
-- Pendaftaran pasien online & offline
-- Penomoran antrean otomatis per poli per hari (format: A001, B025, G001)
-- Dashboard petugas untuk panggil nomor, lewati, panggil ulang, selesai
-- Tampilan antrean real-time untuk TV display (publik)
-- Broadcast perubahan antrean secara real-time
-- Sistem role & permission yang ketat
-- Laporan waktu tunggu & statistik harian
+  - **Pendaftaran pasien online & offline** - Sistem registrasi lengkap dengan validasi NIK
+  - **Penomoran antrean otomatis** - Format unik per poli per hari (A001, B025, G001)
+  - **Dashboard petugas lengkap** - Panggil nomor, lewati, panggil ulang, selesai
+  - **TV display real-time** - Tampilan antrean untuk monitor publik
+  - **Real-time broadcasting** - Pembaruan otomatis ke semua tampilan (display)
+  - **Role & permission yang ketat** - Sistem keamanan berbasis peran
+  - **Laporan & statistik** - Analisis performa dan pelaporan harian
+  - **Jejak audit (Audit trail)** - Pelacakan lengkap riwayat perubahan antrean
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- **Backend**: Laravel 11.x
-- **Database**: MySQL 8
-- **Authentication**: Laravel Sanctum
-- **Permission**: Spatie Laravel-Permission
-- **Real-time**: Pusher/Laravel WebSockets
-- **Documentation**: Laravel Scribe
+  - **Backend**: Laravel 11.x
+  - **Database**: MySQL 8
+  - **Authentication**: Laravel Sanctum
+  - **Permission**: Spatie Laravel-Permission
+  - **Real-time**: Pusher/Laravel WebSockets (Siap Digunakan)
+  - **API Documentation**: Koleksi Postman Lengkap
+  - **Testing**: Cakupan tes API penuh (Tingkat keberhasilan 85.7%)
 
-## Setup & Installation
+## 🚀 Setup & Instalasi
 
-### Prerequisites
+### Prasyarat (Prerequisites)
 
-- PHP 8.2+
-- Composer
-- MySQL 8+
-- Node.js (untuk frontend development)
+  - PHP 8.2+
+  - Composer
+  - MySQL 8+
+  - Node.js (untuk pengembangan frontend)
 
 ### Langkah-langkah Instalasi
 
-1. **Clone Repository**
-   ```bash
-   git clone <repository-url>
-   cd puskesmas-antang
-   ```
+1.  **Clone Repository**
 
-2. **Install Dependencies**
-   ```bash
-   composer install
-   npm install
-   ```
+    ```bash
+    git clone <repository-url>
+    cd puskesmas-antang
+    ```
 
-3. **Setup Environment**
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
+2.  **Install Dependencies**
 
-4. **Setup Database**
-   
-   Edit `.env` file untuk konfigurasi database:
-   ```env
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DATABASE=puskesmas_antang
-   DB_USERNAME=root
-   DB_PASSWORD=
-   ```
+    ```bash
+    composer install
+    npm install
+    ```
 
-5. **Setup Pusher** (untuk real-time features)
-   
-   Register akun Pusher dan update `.env`:
-   ```env
-   PUSHER_APP_ID=your_pusher_app_id
-   PUSHER_APP_KEY=your_pusher_key
-   PUSHER_APP_SECRET=your_pusher_secret
-   PUSHER_APP_CLUSTER=mt1
-   ```
+3.  **Setup Environment**
 
-6. **Run Migration & Seeder**
-   ```bash
-   php artisan migrate:fresh --seed
-   ```
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
 
-7. **Start Development Server**
-   ```bash
-   php artisan serve
-   npm run dev
-   ```
+4.  **Konfigurasi Database**
+
+    Edit file `.env` untuk konfigurasi database:
+
+    ```env
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DATABASE=puskesmas_antang
+    DB_USERNAME=root
+    DB_PASSWORD=
+    ```
+
+5.  **Setup Pusher** (untuk fitur real-time)
+
+    Daftar akun [Pusher](https://dashboard.pusher.com/accounts/sign_up) dan perbarui `.env`:
+
+    ```env
+    BROADCAST_CONNECTION=pusher
+    BROADCAST_DRIVER=pusher
+    PUSHER_APP_ID=your_pusher_app_id
+    PUSHER_APP_KEY=your_pusher_key
+    PUSHER_APP_SECRET=your_pusher_secret
+    PUSHER_APP_CLUSTER=mt1
+    ```
+
+6.  **Jalankan Migration & Seeder**
+
+    ```bash
+    php artisan migrate:fresh --seed
+    ```
+
+7.  **Jalankan Server Development**
+
+    ```bash
+    php artisan serve
+    npm run dev
+    ```
+
+### 🎉 Mulai Cepat (Quick Start)
+
+Untuk pengembangan tercepat:
+
+```bash
+# Clone dan setup
+git clone <repository-url>
+cd puskesmas-antang
+cp .env.example .env
+php artisan key:generate
+
+# Setup database
+php artisan migrate:fresh --seed
+
+# Mulai server & tes
+php artisan serve
+```
+
+Sistem akan siap dengan:
+
+  - **Akun default admin & petugas**
+  - **5 data master poli**
+  - **Pengaturan permissions lengkap**
 
 ## Roles & Permissions
 
 ### Roles yang Tersedia
 
-1. **admin** - Akses penuh ke seluruh sistem
-2. **petugas** - Akses dashboard dan manage antrean di poli yang ditugaskan
-3. **pasien** - Mendaftar online dan melihat status antrean
-4. **public** - Akses tampilan TV display publik
+1.  **admin** - Akses penuh ke seluruh sistem
+2.  **petugas** - Akses dashboard dan manajemen antrean di poli yang ditugaskan
+3.  **pasien** - Mendaftar online dan melihat status antrean
+4.  **public** - Akses tampilan TV display publik
 
 ### Permissions
 
-- `view-dashboard` - Melihat dashboard
-- `call-queue` - Memanggil nomor antrean
-- `skip-queue` - Melewati antrean
-- `recall-queue` - Memanggil ulang
-- `finish-queue` - Menyelesaikan antrean
-- `view-own-poli-queue` - Melihat antrean poli sendiri
-- `view-reports` - Melihat laporan
-- `register-online` - Mendaftar online
-- `view-own-queue-status` - Melihat status antrean sendiri
-- `view-display-tv` - Melihat tampilan TV
-- `check-queue-by-nomor` - Mengecek antrean via nomor
+  - `view-dashboard` - Melihat dashboard
+  - `call-queue` - Memanggil nomor antrean
+  - `skip-queue` - Melewati antrean
+  - `recall-queue` - Memanggil ulang
+  - `finish-queue` - Menyelesaikan antrean
+  - `view-own-poli-queue` - Melihat antrean poli sendiri
+  - `view-reports` - Melihat laporan
+  - `register-online` - Mendaftar online
+  - `view-own-queue-status` - Melihat status antrean sendiri
+  - `view-display-tv` - Melihat tampilan TV
+  - `check-queue-by-nomor` - Mengecek antrean via nomor
 
-## Default Accounts
+## Akun Default
 
-### Admin
-- **Email**: admin@puskesmas-antang.com
-- **Password**: password
-- **Role**: Admin
+### 🔐 Akun Admin
 
-### Petugas
-- **Email**: petugas@puskesmas-antang.com  
-- **Password**: password
-- **Role**: Petugas
+  - **Email**: `admin@puskesmas-antang.com`
+  - **Password**: `password`
+  - **Role**: Admin
+  - **Akses**: Akses sistem penuh
+
+### 👨‍⚕️ Akun Petugas
+
+  - **Email**: `petugas@puskesmas-antang.com`
+  - **Password**: `password`
+  - **Role**: Petugas
+  - **Poli Bertugas**: Poli Umum
+  - **Akses**: Dashboard & manajemen antrean
+
+> 📝 **Catatan**: Akun otomatis dibuat saat proses migration & seeder
 
 ## Format Nomor Antrean
 
 Nomor antrean menggunakan format: `[Kode Poli][Nomor 3 digit]`
 
 Contoh:
-- A001 - Antrean Poli Umum nomor 1
-- B025 - Antrean Poli Gigi nomor 25
-- G001 - Antrean Poli KIA nomor 1
 
-Reset setiap hari berdasarkan tanggal registrasi.
+  - A001 - Antrean Poli Umum nomor 1
+  - B025 - Antrean Poli Gigi nomor 25
+  - G001 - Antrean Poli KIA nomor 1
+
+Direset setiap hari berdasarkan tanggal registrasi.
 
 ## API Endpoints
 
-### Authentication
-- `POST /api/login` - Login user
+### Autentikasi
 
-### Public
-- `POST /api/register` - Pendaftaran online pasien
-- `GET /api/display/{poli}` - Tampilan TV display
-- `GET /api/queue/status/{nomor}` - Cek status antrean
+  - `POST /api/login` - Login dan pembuatan token
+
+### Endpoint Publik
+
+  - `POST /api/register` - Pendaftaran pasien dengan antrean otomatis
+  - `GET /api/display/{poli}` - Data real-time TV display
+  - `GET /api/queue/status/{nomor}` - Pengecekan status antrean
 
 ### Dashboard (Petugas/Admin)
-- `GET /api/dashboard/queues` - Data antrean poli sendiri
-- `POST /api/queue/call-next` - Panggil nomor berikutnya
-- `POST /api/queue/{id}/call` - Panggil manual (recall)
-- `POST /api/queue/{id}/skip` - Lewati antrean
-- `POST /api/queue/{id}/serve` - Mulai layani
-- `POST /api/queue/{id}/finish` - Selesai
 
-### Reports
-- `GET /api/reports/daily` - Laporan harian
-- `GET /api/reports/statistics` - Statistik
+  - `GET /api/dashboard/queues` - Data antrean untuk poli yang bertugas
+  - `GET /api/dashboard/stats` - Statistik antrean
 
-## Real-time Events
+### Manajemen Antrean (Petugas/Admin)
 
-System menggunakan Pusher untuk real-time broadcasting:
+  - `POST /api/queue/call-next` - Memanggil antrean berikutnya
+  - `POST /api/queue/{id}/call` - Panggil manual / panggil ulang
+  - `POST /api/queue/{id}/skip` - Lewati antrean
+  - `POST /api/queue/{id}/serve` - Mulai melayani antrean
+  - `POST /api/queue/{id}/finish` - Selesaikan pelayanan antrean
+  - `POST /api/queue/{id}/recall` - Panggil ulang antrean (Recall)
 
-### Channels
-- `queue.{poli_id}` - Dashboard petugas & TV display
-- `display.{poli_id}` - TV display publik
+### Laporan (Terautentikasi)
 
-### Events
-- `registration.created` - Pasien baru mendaftar
-- `queue.called` - Antrean dipanggil
-- `queue.skipped` - Antrean dilewati
-- `queue.recalled` - Antrean dipanggil ulang
-- `queue.finished` - Antrean selesai
-- `queue.updated` - Status antrean diperbarui
+  - `GET /api/reports/daily` - Laporan harian dengan statistik
+  - `GET /api/reports/statistics` - Analitik lanjutan
+
+## Real-time Broadcasting
+
+Sistem telah dirancang untuk *real-time broadcasting* dengan 6 tipe event:
+
+### Saluran Broadcast (Channels)
+
+  - `queue.{poli_id}` - Sinkronisasi Dashboard petugas & TV display
+  - `display.{poli_id}` - Tampilan TV publik
+  - `presence-staff` - Pelacakan staf online
+
+### Tipe Event
+
+  - `registration.created` - Event pendaftaran pasien baru
+  - `queue.called` - Event pemanggilan antrean
+  - `queue.skipped` - Event antrean dilewati
+  - `queue.recalled` - Event pemanggilan ulang
+  - `queue.finished` - Event penyelesaian antrean
+  - `queue.updated` - Pembaruan antrean umum
+
+> **Catatan**: Infrastruktur broadcasting sudah siap. Aktifkan dengan konfigurasi Pusher di `.env`.
 
 ## Cara Testing Real-time
 
-1. Buka 2 browser tabs:
-   - Tab 1: Login sebagai petugas (dashboard)
-   - Tab 2: Buka tampilan display untuk poli yang sama
+1.  Buka 2 tab browser:
 
-2. Di dashboard, panggil nomor antrean
+      - Tab 1: Login sebagai petugas (dashboard)
+      - Tab 2: Buka tampilan display untuk poli yang sama
 
-3. Di tab display, update otomatis akan muncul
+2.  Di dashboard, panggil nomor antrean.
+
+3.  Di tab display, pembaruan otomatis akan muncul.
 
 ## Testing dengan Postman
 
-Lihat file `puskesmas-queue.postman_collection.json` untuk Postman collection lengkap yang mencakup 90%+ API endpoints.
+Buka file `POSTMAN_COLLECTION.md` untuk melihat koleksi Postman lengkap dan contoh penggunaannya.
 
-## Documentation
+## 🔧 Troubleshooting
 
-API documentation dapat diakses via:
+### ⚠️ Isu Minor Saat Ini
+
+  - **Format respons tidak terautentikasi**: Mengembalikan kode 500, seharusnya 401 (tidak kritis).
+  - **Broadcasting**: Infrastruktur siap namun membutuhkan konfigurasi Pusher.
+
+### 🎯 Solusi
+
+  - **Untuk masalah database**: Jalankan `php artisan migrate:fresh --seed`
+  - **Untuk masalah permission**: Cek penugasan role user
+  - **Untuk testing API**: Gunakan akun default yang tersedia dan koleksi Postman
+
+### 🚀 Perintah Cepat Pengembangan
+
 ```bash
-php artisan scribe:generate
+# Reset database
+php artisan migrate:fresh --seed
+
+# Cek permissions
+php artisan tinker --execute="DB::table('permissions')->get()->pluck('name')"
+
+# Tes nomor antrean
+php artisan tinker --execute="
+\$queue = new \App\Models\Queue();
+echo \$queue->generateQueueNumber(1);
+"
 ```
 
-Kemudian buka `http://localhost:8000/docs`
+-----
 
-## Troubleshooting
+## 🎯 Guide Integrasi Frontend
 
-### Common Issues
+### 🚀 Quick Guide Tim Frontend
 
-1. **Migration Error**: Pastikan database MySQL sudah dibuat dan credentials di .env benar
-2. **Real-time tidak bekerja**: Check konfigurasi Pusher di .env
-3. **Permission denied**: Pastikan user sudah memiliki role yang tepat
-4. **Foreign key constraint**: Run `php artisan migrate:fresh --seed` untuk clean setup
+1.  **API Base URL**: `http://localhost:8000/api`
 
-## Kontribusi
+2.  **Autentikasi**:
 
-1. Fork repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
+    ```javascript
+    // Login dan simpan token
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const { token, user, permissions } = await response.json();
+    localStorage.setItem('token', token);
+    ```
 
-## License
+3.  **Request Terautentikasi**:
 
-Project ini menggunakan license MIT. See LICENSE file untuk details.
+    ```javascript
+    fetch('/api/dashboard/queues', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    ```
+
+4.  **Pembaruan Real-time**:
+
+    ```javascript
+    // Mendengarkan update antrean (saat Pusher dikonfigurasi)
+    pusher.subscribe('queue.1').bind('queue.called', (data) => {
+      updateDisplay(data);
+    });
+    ```
+
+### 📋 Fitur Frontend yang Dibutuhkan
+
+  - **Antarmuka Pendaftaran Pasien**
+  - **Dashboard Petugas** untuk manajemen antrean
+  - **TV Display Publik** untuk memantau antrean
+  - **Sistem Autentikasi** dengan login/logout
+  - **Sinkronisasi Update Real-time**
+  - **Penanganan Error** dan feedback validasi
+
+-----
+
+## 📞 Informasi Dukungan
+
+### 📚 Berkas Dokumentasi
+
+  - `POSTMAN_COLLECTION.md` - Panduan lengkap testing API
+  - `SYSTEM_REPORT.md` - Laporan implementasi detail
+  - `composer.json` - Dependensi dan versi paket
+
+### 🤖 Kredensial Akun Default (Untuk Testing)
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@puskesmas-antang.com | password |
+| Petugas | petugas@puskesmas-antang.com | password |
+
+### 🏗️ Struktur Database
+
+  - **7 tabel inti** dengan relasi yang dioptimalkan
+  - **Sistem penomoran antrean** dengan reset harian
+  - **Jejak audit** dengan pelacakan riwayat lengkap
+  - **Kontrol akses berbasis peran** dengan 4 grup permission

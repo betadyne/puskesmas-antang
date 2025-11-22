@@ -15,15 +15,25 @@ class QueueOwnership
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // For routes without auth middleware (shouldn't happen due to route config)
         $user = $request->user();
+        
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthenticated',
+                'errors' => [
+                    'auth' => ['Authentication required']
+                ]
+            ], 401);
+        }
 
         // Allow admin to access all queues
-        if ($user && $user->hasRole('admin')) {
+        if ($user->hasRole('admin')) {
             return $next($request);
         }
 
         // For petugas, check if they can manipulate the queue
-        if ($user && $user->hasRole('petugas')) {
+        if ($user->hasRole('petugas')) {
             // Get queue ID from route parameters
             $queueId = $request->route('queue') ?? $request->route('id');
 
@@ -59,6 +69,11 @@ class QueueOwnership
             ], 403);
         }
 
-        return $next($request);
+        return response()->json([
+            'message' => 'Access denied',
+            'errors' => [
+                'role' => ['Insufficient permissions']
+            ]
+        ], 403);
     }
 }

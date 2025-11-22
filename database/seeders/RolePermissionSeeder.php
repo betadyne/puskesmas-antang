@@ -88,6 +88,7 @@ class RolePermissionSeeder extends Seeder
         ], [
             'name' => 'Petugas Poli Umum',
             'password' => Hash::make('password'),
+            'poli_id' => 1, // Assign to Poli Umum
         ]);
         $petugas->assignRole('petugas');
     }

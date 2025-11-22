@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('tanggal_daftar');
             $table->foreignId('poli_tujuan')->constrained('polis')->onDelete('cascade');
             $table->enum('cara_daftar', ['online', 'offline']);
-            $table->enum('status', ['menunggu', 'selesai', 'batal'])->default('menunggu');
+            $table->enum('status', ['terdaftar', 'dibatalkan', 'selesai'])->default('terdaftar');
             $table->timestamps();
         });
     }

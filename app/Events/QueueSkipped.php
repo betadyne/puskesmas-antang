@@ -52,12 +52,10 @@ class QueueSkipped implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'queue' => [
-                'id' => $this->queue->id,
-                'nomor_antrean' => $this->queue->nomor_antrean,
-                'poli' => $this->queue->poli,
-                'status' => $this->queue->status,
-            ],
+            'queue_id' => $this->queue->id,
+            'nomor_antrean' => $this->queue->nomor_antrean,
+            'poli_id' => $this->queue->poli_id,
+            'status' => $this->queue->status,
             'message' => 'Nomor antrean ' . $this->queue->nomor_antrean . ' dilewati',
         ];
     }

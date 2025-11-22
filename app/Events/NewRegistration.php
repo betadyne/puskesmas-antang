@@ -22,10 +22,10 @@ class NewRegistration implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(Registration $registration, Queue $queue)
+    public function __construct(Queue $queue)
     {
-        $this->registration = $registration;
         $this->queue = $queue;
+        $this->registration = $queue->registration;
     }
 
     /**
@@ -55,17 +55,13 @@ class NewRegistration implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'queue' => [
-                'id' => $this->queue->id,
-                'nomor_antrean' => $this->queue->nomor_antrean,
-                'poli_id' => $this->queue->poli_id,
-                'poli_nama' => $this->queue->poli->nama_poli,
-                'status' => $this->queue->status,
-                'patient' => [
-                    'nama' => $this->registration->patient->nama,
-                ],
-                'created_at' => $this->queue->created_at,
-            ],
+            'queue_id' => $this->queue->id,
+            'nomor_antrean' => $this->queue->nomor_antrean,
+            'poli_id' => $this->queue->poli_id,
+            'poli_nama' => $this->queue->poli->nama_poli,
+            'status' => $this->queue->status,
+            'patient_nama' => $this->registration->patient->nama,
+            'created_at' => $this->queue->created_at->toISOString(),
             'message' => 'Pasien baru mendaftar untuk ' . $this->queue->nomor_antrean,
         ];
     }

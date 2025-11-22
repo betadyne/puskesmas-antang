@@ -52,16 +52,13 @@ class QueueCalled implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'queue' => [
-                'id' => $this->queue->id,
-                'nomor_antrean' => $this->queue->nomor_antrean,
-                'poli' => $this->queue->poli,
-                'status' => $this->queue->status,
-                'called_at' => $this->queue->called_at,
-                'patient' => [
-                    'nama' => $this->queue->registration->patient->nama,
-                ],
-            ],
+            'queue_id' => $this->queue->id,
+            'nomor_antrean' => $this->queue->nomor_antrean,
+            'poli_id' => $this->queue->poli_id,
+            'poli_nama' => $this->queue->poli->nama_poli,
+            'status' => $this->queue->status,
+            'patient_nama' => $this->queue->registration->patient->nama,
+            'called_at' => $this->queue->called_at?->toISOString(),
             'message' => 'Nomor antrean ' . $this->queue->nomor_antrean . ' dipanggil',
         ];
     }
