@@ -18,10 +18,10 @@ Sistem informasi antrian pasien modern untuk Puskesmas Antang Makassar dengan fi
   - **Backend**: Laravel 11.x
   - **Database**: MySQL 8
   - **Authentication**: Laravel Sanctum
+  - **ORM**: Eloquent
   - **Permission**: Spatie Laravel-Permission
-  - **Real-time**: Pusher/Laravel WebSockets (Siap Digunakan)
-  - **API Documentation**: Koleksi Postman Lengkap
-  - **Testing**: Cakupan tes API penuh (Tingkat keberhasilan 85.7%)
+  - **Real-time**: Pusher/Laravel WebSockets
+  - **API Documentation**: Postman Collection
 
 ## 🚀 Setup & Instalasi
 
