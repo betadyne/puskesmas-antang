@@ -1,25 +1,34 @@
-# Postman Collection - Puskesmas Antang Queue System
+# Postman Collection - Sistem Antrean Puskesmas Antang
 
 ## Environment Variables
+
 ```
 BASE_URL = http://localhost:8000
 ```
 
-## Authentication
+## Autentikasi (Authentication)
 
-### 1. Login (Public)
-- **Method**: POST
-- **URL**: `{{BASE_URL}}/api/login`
-- **Headers**: 
-  - Content-Type: application/json
-- **Body** (Raw JSON):
+### 1\. Login (Publik)
+
+  - **Method**: POST
+  - **URL**: `{{BASE_URL}}/api/login`
+  - **Headers**:
+      - Content-Type: application/json
+  - **Body** (Raw JSON):
+
+<!-- end list -->
+
 ```json
 {
     "email": "admin@puskesmas-antang.com",
     "password": "password"
 }
 ```
-- **Response**:
+
+  - **Response**:
+
+<!-- end list -->
+
 ```json
 {
     "message": "Login successful",
@@ -32,10 +41,14 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-### 2. Login as Petugas
-- **Method**: POST
-- **URL**: `{{BASE_URL}}/api/login`
-- **Body**:
+### 2\. Login sebagai Petugas
+
+  - **Method**: POST
+  - **URL**: `{{BASE_URL}}/api/login`
+  - **Body**:
+
+<!-- end list -->
+
 ```json
 {
     "email": "petugas@puskesmas-antang.com",
@@ -43,14 +56,18 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-## Patient Registration
+## Pendaftaran Pasien
 
-### 3. Register Patient (Public)
-- **Method**: POST
-- **URL**: `{{BASE_URL}}/api/register`
-- **Headers**: 
-  - Content-Type: application/json
-- **Body**:
+### 3\. Daftar Pasien (Publik)
+
+  - **Method**: POST
+  - **URL**: `{{BASE_URL}}/api/register`
+  - **Headers**:
+      - Content-Type: application/json
+  - **Body**:
+
+<!-- end list -->
+
 ```json
 {
     "nik": "1234567890123456",
@@ -65,7 +82,11 @@ BASE_URL = http://localhost:8000
     "cara_daftar": "online"
 }
 ```
-- **Response**:
+
+  - **Response**:
+
+<!-- end list -->
+
 ```json
 {
     "message": "Registration successful",
@@ -83,14 +104,18 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-## Display (Public Access)
+## Tampilan / Display (Akses Publik)
 
-### 4. TV Display - Show Queue for Specific Poli
-- **Method**: GET
-- **URL**: `{{BASE_URL}}/api/display/A` (or poli code: B, C, D, E)
-- **Headers**: 
-  - Content-Type: application/json
-- **Response**:
+### 4\. TV Display - Tampilkan Antrean per Poli
+
+  - **Method**: GET
+  - **URL**: `{{BASE_URL}}/api/display/A` (atau kode poli: B, C, D, E)
+  - **Headers**:
+      - Content-Type: application/json
+  - **Response**:
+
+<!-- end list -->
+
 ```json
 {
     "message": "Display data retrieved successfully",
@@ -108,10 +133,14 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-### 5. Check Queue Status by Number
-- **Method**: GET
-- **URL**: `{{BASE_URL}}/api/queue/status/A001`
-- **Response**:
+### 5\. Cek Status Antrean berdasarkan Nomor
+
+  - **Method**: GET
+  - **URL**: `{{BASE_URL}}/api/queue/status/A001`
+  - **Response**:
+
+<!-- end list -->
+
 ```json
 {
     "message": "Queue status retrieved successfully",
@@ -124,15 +153,19 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-## Dashboard (Authenticated - Petugas/Admin)
+## Dashboard (Terautentikasi - Petugas/Admin)
 
-### 6. Get Dashboard Queues
-- **Method**: GET
-- **URL**: `{{BASE_URL}}/api/dashboard/queues`
-- **Headers**: 
-  - Authorization: Bearer {{token}}
-  - Content-Type: application/json
-- **Response**:
+### 6\. Ambil Data Antrean Dashboard
+
+  - **Method**: GET
+  - **URL**: `{{BASE_URL}}/api/dashboard/queues`
+  - **Headers**:
+      - Authorization: Bearer {{token}}
+      - Content-Type: application/json
+  - **Response**:
+
+<!-- end list -->
+
 ```json
 {
     "message": "Queue data retrieved successfully",
@@ -148,12 +181,16 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-### 7. Get Dashboard Statistics
-- **Method**: GET
-- **URL**: `{{BASE_URL}}/api/dashboard/stats`
-- **Headers**: 
-  - Authorization: Bearer {{token}}
-- **Response**:
+### 7\. Ambil Statistik Dashboard
+
+  - **Method**: GET
+  - **URL**: `{{BASE_URL}}/api/dashboard/stats`
+  - **Headers**:
+      - Authorization: Bearer {{token}}
+  - **Response**:
+
+<!-- end list -->
+
 ```json
 {
     "message": "Statistics retrieved successfully",
@@ -167,12 +204,16 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-### 8. Get My Queue (Authenticated Patient)
-- **Method**: GET
-- **URL**: `{{BASE_URL}}/api/my-queue`
-- **Headers**: 
-  - Authorization: Bearer {{token}}
-- **Response**:
+### 8\. Ambil Antrean Saya (Pasien Terautentikasi)
+
+  - **Method**: GET
+  - **URL**: `{{BASE_URL}}/api/my-queue`
+  - **Headers**:
+      - Authorization: Bearer {{token}}
+  - **Response**:
+
+<!-- end list -->
+
 ```json
 {
     "message": "User queue retrieved successfully",
@@ -185,15 +226,19 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-## Queue Management (Authenticated - Petugas/Admin)
+## Manajemen Antrean (Terautentikasi - Petugas/Admin)
 
-### 9. Call Next Queue
-- **Method**: POST
-- **URL**: `{{BASE_URL}}/api/queue/call-next`
-- **Headers**: 
-  - Authorization: Bearer {{token}}
-  - Content-Type: application/json
-- **Response**:
+### 9\. Panggil Antrean Berikutnya
+
+  - **Method**: POST
+  - **URL**: `{{BASE_URL}}/api/queue/call-next`
+  - **Headers**:
+      - Authorization: Bearer {{token}}
+      - Content-Type: application/json
+  - **Response**:
+
+<!-- end list -->
+
 ```json
 {
     "message": "Queue called successfully",
@@ -206,19 +251,24 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-### 10. Call Specific Queue (Recall)
-- **Method**: POST
-- **URL**: `{{BASE_URL}}/api/queue/1/call`
-- **Headers**: 
-  - Authorization: Bearer {{token}}
-- **Response**: Same as Call Next
+### 10\. Panggil Antrean Spesifik (Panggil Ulang/Manual)
 
-### 11. Skip Queue
-- **Method**: POST
-- **URL**: `{{BASE_URL}}/api/queue/1/skip`
-- **Headers**: 
-  - Authorization: Bearer {{token}}
-- **Response**:
+  - **Method**: POST
+  - **URL**: `{{BASE_URL}}/api/queue/1/call`
+  - **Headers**:
+      - Authorization: Bearer {{token}}
+  - **Response**: Sama seperti Panggil Berikutnya (Call Next)
+
+### 11\. Lewati Antrean (Skip)
+
+  - **Method**: POST
+  - **URL**: `{{BASE_URL}}/api/queue/1/skip`
+  - **Headers**:
+      - Authorization: Bearer {{token}}
+  - **Response**:
+
+<!-- end list -->
+
 ```json
 {
     "message": "Queue skipped successfully",
@@ -230,12 +280,16 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-### 12. Start Serving Queue
-- **Method**: POST
-- **URL**: `{{BASE_URL}}/api/queue/1/serve`
-- **Headers**: 
-  - Authorization: Bearer {{token}}
-- **Response**:
+### 12\. Mulai Layani Antrean (Serve)
+
+  - **Method**: POST
+  - **URL**: `{{BASE_URL}}/api/queue/1/serve`
+  - **Headers**:
+      - Authorization: Bearer {{token}}
+  - **Response**:
+
+<!-- end list -->
+
 ```json
 {
     "message": "Queue serving started",
@@ -248,12 +302,16 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-### 13. Finish Queue
-- **Method**: POST
-- **URL**: `{{BASE_URL}}/api/queue/1/finish`
-- **Headers**: 
-  - Authorization: Bearer {{token}}
-- **Response**:
+### 13\. Selesaikan Antrean (Finish)
+
+  - **Method**: POST
+  - **URL**: `{{BASE_URL}}/api/queue/1/finish`
+  - **Headers**:
+      - Authorization: Bearer {{token}}
+  - **Response**:
+
+<!-- end list -->
+
 ```json
 {
     "message": "Queue finished successfully",
@@ -266,12 +324,16 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-### 14. Recall Queue
-- **Method**: POST
-- **URL**: `{{BASE_URL}}/api/queue/1/recall`
-- **Headers**: 
-  - Authorization: Bearer {{token}}
-- **Response**:
+### 14\. Panggil Ulang Antrean (Recall)
+
+  - **Method**: POST
+  - **URL**: `{{BASE_URL}}/api/queue/1/recall`
+  - **Headers**:
+      - Authorization: Bearer {{token}}
+  - **Response**:
+
+<!-- end list -->
+
 ```json
 {
     "message": "Queue recalled successfully",
@@ -284,17 +346,21 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-## Reports (Authenticated - Admin/Petugas)
+## Laporan (Terautentikasi - Admin/Petugas)
 
-### 15. Daily Report
-- **Method**: GET
-- **URL**: `{{BASE_URL}}/api/reports/daily`
-- **Query Parameters** (optional):
-  - `date`: YYYY-MM-DD (defaults to today)
-  - `poli_id`: 1,2,3,4,5
-- **Headers**: 
-  - Authorization: Bearer {{token}}
-- **Response**:
+### 15\. Laporan Harian
+
+  - **Method**: GET
+  - **URL**: `{{BASE_URL}}/api/reports/daily`
+  - **Parameter Query** (opsional):
+      - `date`: YYYY-MM-DD (default hari ini)
+      - `poli_id`: 1,2,3,4,5
+  - **Headers**:
+      - Authorization: Bearer {{token}}
+  - **Response**:
+
+<!-- end list -->
+
 ```json
 {
     "message": "Daily report generated successfully",
@@ -311,17 +377,21 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-### 16. Statistics Report
-- **Method**: GET
-- **URL**: `{{BASE_URL}}/api/reports/statistics`
-- **Query Parameters** (optional):
-  - `period`: week|month|custom
-  - `start_date`: YYYY-MM-DD
-  - `end_date`: YYYY-MM-DD
-  - `poli_id`: 1,2,3,4,5
-- **Headers**: 
-  - Authorization: Bearer {{token}}
-- **Response**:
+### 16\. Laporan Statistik
+
+  - **Method**: GET
+  - **URL**: `{{BASE_URL}}/api/reports/statistics`
+  - **Parameter Query** (opsional):
+      - `period`: week|month|custom
+      - `start_date`: YYYY-MM-DD
+      - `end_date`: YYYY-MM-DD
+      - `poli_id`: 1,2,3,4,5
+  - **Headers**:
+      - Authorization: Bearer {{token}}
+  - **Response**:
+
+<!-- end list -->
+
 ```json
 {
     "message": "Statistics generated successfully",
@@ -337,17 +407,20 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-## Error Responses
+## Respons Error
 
-### Common Error Formats
-**401 Unauthorized**:
+### Format Error Umum
+
+**401 Unauthorized (Tidak Terautentikasi)**:
+
 ```json
 {
     "message": "Unauthenticated."
 }
 ```
 
-**403 Forbidden**:
+**403 Forbidden (Terlarang)**:
+
 ```json
 {
     "message": "Anda tidak memiliki akses ke poli ini",
@@ -357,7 +430,8 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-**422 Validation Error**:
+**422 Validation Error (Validasi Gagal)**:
+
 ```json
 {
     "message": "Validation failed",
@@ -368,7 +442,8 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-**404 Not Found**:
+**404 Not Found (Tidak Ditemukan)**:
+
 ```json
 {
     "message": "Antrean tidak ditemukan",
@@ -376,22 +451,27 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-## WebSocket Events (Real-time)
+## Event WebSocket (Real-time)
 
-### Channels to Listen:
-1. **Queue Updates**: `queue.{poli_id}` (e.g., `queue.1`)
-   - Events: `queue.called`, `queue.skipped`, `queue.finished`, `queue.updated`
-   - For dashboard and TV display
+### Channel untuk Didengarkan (Listen):
 
-2. **Display Updates**: `display.{poli_id}` (e.g., `display.1`)
-   - Events: `queue.called`, `queue.skipped`, `queue.finished`, `registration.created`
-   - For TV display only
+1.  **Update Antrean**: `queue.{poli_id}` (cth: `queue.1`)
 
-3. **Individual Queue**: `queue.{queue_id}.updates`
-   - Events: All queue updates for specific queue
-   - For individual patient tracking
+      - Events: `queue.called` (dipanggil), `queue.skipped` (dilewati), `queue.finished` (selesai), `queue.updated` (diperbarui)
+      - Digunakan untuk dashboard dan TV display.
 
-### Sample Event Payload:
+2.  **Update Display**: `display.{poli_id}` (cth: `display.1`)
+
+      - Events: `queue.called`, `queue.skipped`, `queue.finished`, `registration.created`
+      - Khusus untuk TV display.
+
+3.  **Antrean Individu**: `queue.{queue_id}.updates`
+
+      - Events: Semua update antrean untuk antrean spesifik
+      - Digunakan untuk pelacakan pasien individu.
+
+### Contoh Payload Event:
+
 ```json
 {
     "event": "queue.called",
@@ -410,25 +490,25 @@ BASE_URL = http://localhost:8000
 }
 ```
 
-## Testing Tips
+## Tips Pengujian (Testing)
 
-1. **Get Token First**: Always login first and copy the token for authenticated requests
-2. **Test Different Roles**: Test with admin and petugas accounts to see different access levels
-3. **Real-time Testing**: Open multiple browser tabs - one for dashboard, one for TV display
-4. **Queue Flow**: Register → Call → Serve → Finish to test complete workflow
-5. **Error Cases**: Try accessing cross-poli data with petugas account to test middleware
+1.  **Dapatkan Token Terlebih Dahulu**: Selalu login dulu dan salin token untuk request yang membutuhkan autentikasi.
+2.  **Tes Role Berbeda**: Tes dengan akun admin dan petugas untuk melihat level akses yang berbeda.
+3.  **Testing Real-time**: Buka beberapa tab browser - satu untuk dashboard, satu untuk TV display.
+4.  **Alur Antrean**: Lakukan urutan Daftar → Panggil → Layani → Selesai untuk mengetes alur kerja lengkap.
+5.  **Kasus Error**: Coba akses data lintas-poli dengan akun petugas untuk mengetes middleware.
 
-## Default Test Accounts
+## Akun Tes Default
 
-- **Admin**: admin@puskesmas-antang.com / password
-- **Petugas**: petugas@puskesmas-antang.com / password
+  - **Admin**: admin@puskesmas-antang.com / password
+  - **Petugas**: petugas@puskesmas-antang.com / password
 
-## Poli Codes
+## Kode Poli
 
-- **A**: Poli Umum
-- **B**: Poli Gigi
-- **C**: Poli KIA
-- **D**: Poli Lansia
-- **E**: Poli Gizi
+  - **A**: Poli Umum
+  - **B**: Poli Gigi
+  - **C**: Poli KIA
+  - **D**: Poli Lansia
+  - **E**: Poli Gizi
 
-Use these codes for display endpoints and testing.
+Gunakan kode ini untuk endpoint display dan testing.
