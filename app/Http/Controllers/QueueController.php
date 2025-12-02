@@ -23,27 +23,49 @@ class QueueController extends Controller
     public function dashboard(Request $request)
     {
         $user = $request->user();
+        $poliId = $user->hasRole('admin') ? null : $user->poli_id;
         
-        // Admin can see all polis, petugas only their assigned poli
-        if ($user->hasRole('admin')) {
-            $queues = Queue::with(['registration.patient', 'poli'])
-                ->today()
-                ->orderBy('status')
-                ->orderBy('created_at')
-                ->get();
-        } else {
-            // Petugas only sees their poli queues
-            $queues = Queue::with(['registration.patient', 'poli'])
-                ->where('poli_id', $user->poli_id)
-                ->today()
-                ->orderBy('status')
-                ->orderBy('created_at')
-                ->get();
+        // Build base query
+        $baseQuery = Queue::with(['registration.patient', 'poli'])->today();
+        
+        if ($poliId) {
+            $baseQuery = $baseQuery->where('poli_id', $poliId);
         }
+
+        // Get current queue being served (dipanggil or sedang dilayani)
+        $currentQueue = (clone $baseQuery)
+            ->whereIn('status', ['dipanggil', 'sedang dilayani'])
+            ->orderBy('called_at', 'desc')
+            ->first();
+
+        // Get waiting queues
+        $waitingQueues = (clone $baseQuery)
+            ->where('status', 'menunggu')
+            ->orderBy('created_at')
+            ->get();
+
+        // Get recent history (completed or skipped)
+        $historyQueues = (clone $baseQuery)
+            ->whereIn('status', ['selesai', 'dilewati'])
+            ->orderBy('updated_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Get stats
+        $stats = [
+            'total_waiting' => (clone $baseQuery)->where('status', 'menunggu')->count(),
+            'total_served' => (clone $baseQuery)->where('status', 'selesai')->count(),
+            'total_skipped' => (clone $baseQuery)->where('status', 'dilewati')->count(),
+        ];
 
         return response()->json([
             'message' => 'Queue data retrieved successfully',
-            'data' => QueueResource::collection($queues)
+            'data' => [
+                'current_queue' => $currentQueue ? new QueueResource($currentQueue) : null,
+                'waiting_queues' => QueueResource::collection($waitingQueues),
+                'history_queues' => QueueResource::collection($historyQueues),
+                'statistics' => $stats,
+            ]
         ]);
     }
 

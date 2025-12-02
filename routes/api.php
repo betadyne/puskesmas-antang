@@ -5,11 +5,23 @@ use App\Http\Controllers\QueueController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DisplayController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\PoliController;
+use App\Http\Controllers\PatientController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [RegistrationController::class, 'store']);
+
+// Public poli list (for registration dropdown)
+Route::get('/poli', function () {
+    $polis = \App\Models\Poli::select('id', 'kode_poli', 'nama_poli', 'slug')->get();
+    return response()->json([
+        'message' => 'Poli list retrieved successfully',
+        'data' => $polis
+    ]);
+});
 
 // Public display routes
 Route::get('/display/{poli}', [DisplayController::class, 'show']);
@@ -17,6 +29,10 @@ Route::get('/queue/status/{nomor}', [DisplayController::class, 'checkQueueStatus
 
 // Protected routes
 Route::middleware(['auth:sanctum'])->group(function () {
+    // Get authenticated user
+    Route::get('/user', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+
     // Dashboard routes (petugas and admin)
     Route::middleware(['permission:view-dashboard'])->prefix('/dashboard')->group(function () {
         Route::get('/queues', [QueueController::class, 'dashboard'])

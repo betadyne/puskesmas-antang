@@ -20,15 +20,18 @@ class RegistrationController extends Controller
      */
     public function store(Request $request)
     {
+        // Check if patient with NIK exists
+        $existingPatient = Patient::where('nik', $request->nik)->first();
+
         $validator = Validator::make($request->all(), [
-            'nik' => 'required|string|max:16|unique:patients,nik',
+            'nik' => 'required|string|max:16',
             'nama' => 'required|string|max:255',
             'no_bpjs' => 'nullable|string|max:50',
-            'tgl_lahir' => 'required|date|before:today',
-            'jenis_kelamin' => 'required|in:L,P',
-            'no_hp' => 'required|string|max:15',
+            'tgl_lahir' => $existingPatient ? 'nullable|date|before:today' : 'required|date|before:today',
+            'jenis_kelamin' => $existingPatient ? 'nullable|in:L,P' : 'required|in:L,P',
+            'no_hp' => $existingPatient ? 'nullable|string|max:15' : 'required|string|max:15',
             'email' => 'nullable|email|max:255',
-            'alamat' => 'required|string|max:500',
+            'alamat' => $existingPatient ? 'nullable|string|max:500' : 'required|string|max:500',
             'poli_tujuan' => 'required|exists:polis,id',
             'cara_daftar' => 'required|in:online,offline',
         ]);
@@ -43,8 +46,8 @@ class RegistrationController extends Controller
         try {
             DB::beginTransaction();
 
-            // Create or find patient
-            $patient = Patient::create([
+            // Find or create patient
+            $patient = $existingPatient ?? Patient::create([
                 'nik' => $request->nik,
                 'nama' => $request->nama,
                 'no_bpjs' => $request->no_bpjs,
@@ -54,6 +57,15 @@ class RegistrationController extends Controller
                 'email' => $request->email,
                 'alamat' => $request->alamat,
             ]);
+
+            // Update existing patient info if provided
+            if ($existingPatient) {
+                $existingPatient->update(array_filter([
+                    'nama' => $request->nama,
+                    'no_hp' => $request->no_hp,
+                    'alamat' => $request->alamat,
+                ]));
+            }
 
             // Get poli information
             $poli = Poli::findOrFail($request->poli_tujuan);

@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  
+  body {
+    @apply font-body text-gray-800 bg-white antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-display font-semibold text-white 
+           bg-gradient-to-r from-primary-600 to-primary-500 rounded-2xl 
+           shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 
+           transform hover:-translate-y-0.5 transition-all duration-300;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-display font-semibold 
+           text-primary-700 bg-primary-50 border-2 border-primary-200 rounded-2xl 
+           hover:bg-primary-100 hover:border-primary-300 transition-all duration-300;
+  }
+
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-display font-semibold text-white 
+           bg-gradient-to-r from-accent-600 to-accent-500 rounded-2xl 
+           shadow-lg shadow-accent-500/25 hover:shadow-xl hover:shadow-accent-500/30 
+           transform hover:-translate-y-0.5 transition-all duration-300;
+  }
+
+  .card {
+    @apply bg-white rounded-3xl p-6 shadow-soft border border-gray-100/50;
+  }
+
+  .card-hover {
+    @apply card hover:shadow-lg hover:-translate-y-1 transition-all duration-300;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 font-body text-gray-800 bg-gray-50 border-2 border-gray-200 
+           rounded-xl focus:bg-white focus:border-primary-400 focus:ring-4 focus:ring-primary-100 
+           outline-none transition-all duration-200 placeholder:text-gray-400;
+  }
+
+  .label-text {
+    @apply block mb-2 font-display font-medium text-gray-700;
+  }
+
+  .stat-card {
+    @apply flex flex-col items-center p-6 bg-white rounded-2xl border border-gray-100;
+  }
+
+  .stat-number {
+    @apply text-4xl font-display font-bold text-primary-600;
+  }
+
+  .stat-label {
+    @apply text-sm text-gray-500 mt-1;
+  }
+
+  .queue-number {
+    @apply font-mono text-7xl font-bold tracking-wider;
+  }
+
+  .queue-number-display {
+    @apply font-mono text-9xl font-bold tracking-wider text-primary-600;
+  }
+
+  .nav-link {
+    @apply font-display font-medium text-gray-600 hover:text-primary-600 transition-colors duration-200;
+  }
+
+  .nav-link-active {
+    @apply font-display font-medium text-primary-600;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 font-display font-medium text-gray-600 
+           rounded-xl hover:bg-primary-50 hover:text-primary-700 transition-all duration-200;
+  }
+
+  .sidebar-link-active {
+    @apply flex items-center gap-3 px-4 py-3 font-display font-medium text-primary-700 
+           bg-primary-50 rounded-xl;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-3 py-1 text-xs font-display font-semibold rounded-full;
+  }
+
+  .badge-success {
+    @apply badge bg-green-100 text-green-700;
+  }
+
+  .badge-warning {
+    @apply badge bg-amber-100 text-amber-700;
+  }
+
+  .badge-info {
+    @apply badge bg-blue-100 text-blue-700;
+  }
+
+  .badge-danger {
+    @apply badge bg-red-100 text-red-700;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-accent-500;
+  }
+
+  .glass {
+    @apply bg-white/70 backdrop-blur-lg;
+  }
+
+  .glass-dark {
+    @apply bg-gray-900/70 backdrop-blur-lg;
+  }
+}
+
+.tv-display-blink {
+  animation: blink 1s ease-in-out infinite;
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.3s ease-out;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full hover:bg-gray-400;
+}
