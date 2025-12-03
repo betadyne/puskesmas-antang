@@ -288,4 +288,3 @@ Setelah menjalankan seeder, akun berikut tersedia:
 - `/admin/users` - Kelola pengguna
 - `/admin/poli` - Kelola poli
 - `/admin/patients` - Data pasien
-- 
