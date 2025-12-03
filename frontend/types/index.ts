@@ -44,18 +44,35 @@ export interface Pasien {
 
 export interface Queue {
   id: number
-  nomor_antrian: string
-  pasien_id: number
+  nomor_antrean?: string
+  nomor_antrian?: string
+  registration_id?: number
   poli_id: number
   petugas_id?: number
   status: QueueStatus
   called_at?: string
+  served_at?: string
   finished_at?: string
+  patient?: Patient
   pasien?: Pasien
   poli?: Poli
   petugas?: User
+  wait_time?: number
+  service_time?: number
   created_at: string
   updated_at: string
+}
+
+export interface Patient {
+  id: number
+  nik: string
+  nama: string
+  no_bpjs?: string
+  tgl_lahir?: string
+  jenis_kelamin?: 'L' | 'P'
+  no_hp?: string
+  alamat?: string
+  created_at?: string
 }
 
 export type QueueStatus = 'menunggu' | 'dipanggil' | 'dilayani' | 'selesai' | 'dilewati'

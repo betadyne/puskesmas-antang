@@ -13,14 +13,14 @@
           class="w-12 h-12 rounded-xl flex items-center justify-center font-mono font-bold text-lg"
           :class="isActive ? 'bg-primary-500 text-white' : 'bg-gray-200 text-gray-600'"
         >
-          {{ queue.nomor_antrian }}
+          {{ queue.nomor_antrean || queue.nomor_antrian }}
         </div>
         <div>
           <p class="font-display font-semibold text-gray-800">
-            {{ queue.pasien?.name || 'Pasien' }}
+            {{ queue.patient?.nama || queue.pasien?.name || 'Pasien' }}
           </p>
           <p class="text-sm text-gray-500">
-            {{ queue.poli?.name || 'Poli' }}
+            {{ queue.poli?.nama_poli || queue.poli?.name || 'Poli' }}
           </p>
         </div>
       </div>
