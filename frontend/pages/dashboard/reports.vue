@@ -78,34 +78,42 @@
             </h3>
 
             <div class="space-y-4">
-              <div
-                v-for="poli in poliStats"
-                :key="poli.id"
-                class="flex items-center justify-between p-4 rounded-xl bg-gray-50"
-              >
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
-                    <UIcon name="i-heroicons-building-office-2" class="w-5 h-5 text-primary-600" />
-                  </div>
-                  <span class="font-display font-medium text-gray-800">{{ poli.name }}</span>
-                </div>
-                <div class="flex items-center gap-4 text-sm">
-                  <span class="text-gray-500">
-                    {{ poli.total }} antrian
-                  </span>
-                  <div class="w-32 h-2 rounded-full bg-gray-200 overflow-hidden">
-                    <div
-                      class="h-full bg-primary-500 rounded-full"
-                      :style="{ width: `${(poli.served / poli.total) * 100}%` }"
-                    ></div>
-                  </div>
-                  <span class="font-medium text-primary-600">
-                    {{ Math.round((poli.served / poli.total) * 100) || 0 }}%
-                  </span>
-                </div>
+              <div v-if="isLoading" class="text-center py-8">
+                <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-gray-300 animate-spin mx-auto mb-2" />
+                <p class="text-gray-500">Memuat data...</p>
               </div>
 
-              <div v-if="poliStats.length === 0" class="text-center py-8">
+              <template v-else-if="poliStats.length > 0">
+                <div
+                  v-for="poli in poliStats"
+                  :key="poli.poli?.id"
+                  class="flex items-center justify-between p-4 rounded-xl bg-gray-50"
+                >
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
+                      <span class="font-mono font-bold text-primary-600 text-sm">{{ poli.poli?.kode_poli }}</span>
+                    </div>
+                    <span class="font-display font-medium text-gray-800">{{ poli.poli?.nama_poli }}</span>
+                  </div>
+                  <div class="flex items-center gap-4 text-sm">
+                    <span class="text-gray-500">
+                      {{ poli.statistics?.total || 0 }} antrian
+                    </span>
+                    <div class="w-32 h-2 rounded-full bg-gray-200 overflow-hidden">
+                      <div
+                        class="h-full bg-primary-500 rounded-full"
+                        :style="{ width: `${getCompletionRate(poli)}%` }"
+                      ></div>
+                    </div>
+                    <span class="font-medium text-primary-600">
+                      {{ getCompletionRate(poli) }}%
+                    </span>
+                  </div>
+                </div>
+              </template>
+
+              <div v-else class="text-center py-8">
+                <UIcon name="i-heroicons-inbox" class="w-10 h-10 text-gray-300 mx-auto mb-2" />
                 <p class="text-gray-500">Belum ada data statistik</p>
               </div>
             </div>
@@ -165,24 +173,34 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="q in historyList"
-                  :key="q.id"
-                  class="border-b border-gray-50 hover:bg-gray-50"
-                >
-                  <td class="py-3 px-4">
-                    <span class="font-mono font-bold text-gray-800">{{ q.nomor_antrian }}</span>
+                <tr v-if="isLoading">
+                  <td colspan="5" class="py-8 text-center text-gray-500">
+                    <UIcon name="i-heroicons-arrow-path" class="w-6 h-6 text-gray-300 animate-spin mx-auto mb-2" />
+                    Memuat data...
                   </td>
-                  <td class="py-3 px-4 text-gray-600">{{ q.pasien?.name || '-' }}</td>
-                  <td class="py-3 px-4 text-gray-600">{{ q.poli?.name || '-' }}</td>
-                  <td class="py-3 px-4">
-                    <span :class="getStatusBadge(q.status)">{{ getStatusText(q.status) }}</span>
-                  </td>
-                  <td class="py-3 px-4 text-sm text-gray-500">{{ formatDate(q.finished_at || q.created_at) }}</td>
                 </tr>
 
-                <tr v-if="historyList.length === 0">
+                <template v-else-if="historyList.length > 0">
+                  <tr
+                    v-for="(q, index) in historyList"
+                    :key="index"
+                    class="border-b border-gray-50 hover:bg-gray-50"
+                  >
+                    <td class="py-3 px-4">
+                      <span class="font-mono font-bold text-gray-800">{{ q.nomor_antrean }}</span>
+                    </td>
+                    <td class="py-3 px-4 text-gray-600">{{ q.pasien || '-' }}</td>
+                    <td class="py-3 px-4 text-gray-600">{{ q.poli || '-' }}</td>
+                    <td class="py-3 px-4">
+                      <span :class="getStatusBadge(q.status)">{{ getStatusText(q.status) }}</span>
+                    </td>
+                    <td class="py-3 px-4 text-sm text-gray-500">{{ q.finished_at || q.created_at }}</td>
+                  </tr>
+                </template>
+
+                <tr v-else>
                   <td colspan="5" class="py-8 text-center text-gray-500">
+                    <UIcon name="i-heroicons-inbox" class="w-10 h-10 text-gray-300 mx-auto mb-2" />
                     Belum ada data riwayat
                   </td>
                 </tr>
@@ -196,8 +214,6 @@
 </template>
 
 <script setup lang="ts">
-import type { Queue, ApiResponse } from '~/types'
-
 definePageMeta({
   layout: false,
   middleware: 'auth',
@@ -209,8 +225,10 @@ useHead({
 
 const config = useRuntimeConfig()
 const authStore = useAuthStore()
+const toast = useToast()
 
 const selectedDate = ref(new Date().toISOString().split('T')[0])
+const isLoading = ref(false)
 
 const stats = ref({
   total_queues: 0,
@@ -222,16 +240,60 @@ const stats = ref({
   max_service_time: 0,
 })
 
-const poliStats = ref<{ id: number; name: string; total: number; served: number }[]>([])
-const historyList = ref<Queue[]>([])
+interface PoliStat {
+  poli: {
+    id: number
+    nama_poli: string
+    kode_poli: string
+  }
+  statistics: {
+    total: number
+    finished: number
+    skipped: number
+    avg_wait_time: number
+  }
+}
+
+interface QueueHistory {
+  nomor_antrean: string
+  pasien: string | null
+  poli: string | null
+  status: string
+  wait_time: number | null
+  service_time: number | null
+  created_at: string
+  called_at: string | null
+  served_at: string | null
+  finished_at: string | null
+}
+
+const poliStats = ref<PoliStat[]>([])
+const historyList = ref<QueueHistory[]>([])
 
 async function fetchReports() {
+  isLoading.value = true
   try {
-    const { data } = await useFetch<ApiResponse<{
-      stats: typeof stats.value
-      poli_stats: typeof poliStats.value
-      history: Queue[]
-    }>>(`${config.public.apiBase}/reports`, {
+    const response = await $fetch<{
+      message: string
+      data: {
+        statistics: {
+          total_queues: number
+          total_waiting: number
+          total_called: number
+          total_being_served: number
+          total_finished: number
+          total_skipped: number
+          avg_service_time: number
+          min_service_time: number
+          max_service_time: number
+          avg_wait_time: number
+          min_wait_time: number
+          max_wait_time: number
+        }
+        by_poli: Record<string, PoliStat>
+        queues: QueueHistory[]
+      }
+    }>(`${config.public.apiBase}/reports/daily`, {
       headers: {
         Authorization: `Bearer ${authStore.token}`,
       },
@@ -240,13 +302,28 @@ async function fetchReports() {
       },
     })
 
-    if (data.value?.success) {
-      stats.value = data.value.data.stats
-      poliStats.value = data.value.data.poli_stats
-      historyList.value = data.value.data.history
+    if (response.data) {
+      stats.value = {
+        total_queues: response.data.statistics.total_queues,
+        total_served: response.data.statistics.total_finished,
+        total_waiting: response.data.statistics.total_waiting,
+        total_skipped: response.data.statistics.total_skipped,
+        avg_service_time: response.data.statistics.avg_service_time,
+        min_service_time: response.data.statistics.min_service_time,
+        max_service_time: response.data.statistics.max_service_time,
+      }
+      poliStats.value = Object.values(response.data.by_poli || {})
+      historyList.value = response.data.queues || []
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching reports:', error)
+    toast.add({
+      title: 'Error',
+      description: 'Gagal memuat data laporan',
+      color: 'red',
+    })
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -254,7 +331,7 @@ function getStatusText(status: string): string {
   const map: Record<string, string> = {
     menunggu: 'Menunggu',
     dipanggil: 'Dipanggil',
-    dilayani: 'Dilayani',
+    'sedang dilayani': 'Dilayani',
     selesai: 'Selesai',
     dilewati: 'Dilewati',
   }
@@ -265,20 +342,18 @@ function getStatusBadge(status: string): string {
   const map: Record<string, string> = {
     menunggu: 'badge-warning',
     dipanggil: 'badge-info',
-    dilayani: 'badge-info',
+    'sedang dilayani': 'badge-info',
     selesai: 'badge-success',
     dilewati: 'badge-danger',
   }
   return map[status] || 'badge'
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleString('id-ID', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+function getCompletionRate(poli: PoliStat): number {
+  const total = poli.statistics?.total || 0
+  const finished = poli.statistics?.finished || 0
+  if (total === 0) return 0
+  return Math.round((finished / total) * 100)
 }
 
 onMounted(() => {
