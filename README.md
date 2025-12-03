@@ -288,7 +288,4 @@ Setelah menjalankan seeder, akun berikut tersedia:
 - `/admin/users` - Kelola pengguna
 - `/admin/poli` - Kelola poli
 - `/admin/patients` - Data pasien
-
-## Lisensi
-
-Hak Cipta 2024 Puskesmas Antang. Seluruh hak dilindungi.
+- 
