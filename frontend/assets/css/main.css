@@ -161,3 +161,84 @@
 ::-webkit-scrollbar-thumb {
   @apply bg-gray-300 rounded-full hover:bg-gray-400;
 }
+
+/* Print Styles */
+@media print {
+  /* Hide everything except print content */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Hide non-printable elements */
+  .no-print,
+  header,
+  footer,
+  nav,
+  aside,
+  .sidebar,
+  .btn-primary,
+  .btn-secondary {
+    display: none !important;
+  }
+
+  /* Show only print ticket */
+  .print-ticket,
+  .print-ticket * {
+    visibility: visible !important;
+    display: block !important;
+  }
+
+  .print-ticket {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ticket-print-container {
+    width: 80mm;
+    max-width: 80mm;
+    margin: 0 auto;
+    padding: 10mm 5mm;
+    font-family: 'Arial', sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    background: white;
+    color: black;
+  }
+
+  .ticket-print-container h2 {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .ticket-print-container .text-5xl {
+    font-size: 48px !important;
+    line-height: 1.2;
+  }
+
+  .ticket-print-container .text-lg {
+    font-size: 14px !important;
+  }
+
+  .ticket-print-container .text-sm {
+    font-size: 11px !important;
+  }
+
+  .ticket-print-container .text-xs {
+    font-size: 10px !important;
+  }
+
+  /* Reset page margins */
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+
+  /* Hide scrollbars */
+  html {
+    overflow: hidden;
+  }
+}

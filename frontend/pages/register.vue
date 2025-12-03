@@ -143,7 +143,7 @@
             </div>
 
             <div v-else class="space-y-6">
-              <div class="card text-center bg-gradient-to-br from-primary-50 to-white border-2 border-primary-200">
+              <div class="card text-center bg-gradient-to-br from-primary-50 to-white border-2 border-primary-200 no-print">
                 <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-6">
                   <UIcon name="i-heroicons-check-circle" class="w-12 h-12 text-green-500" />
                 </div>
@@ -155,7 +155,16 @@
                   Simpan tiket ini untuk menunjukkan ke petugas
                 </p>
 
-                <div class="bg-white rounded-3xl p-8 shadow-soft border border-gray-100 mb-8">
+                <!-- Ticket Card for Save/Print -->
+                <div ref="ticketRef" id="ticket-content" class="bg-white rounded-3xl p-8 shadow-soft border border-gray-100 mb-8">
+                  <div class="text-center mb-4">
+                    <img src="/logo.png" alt="Logo" class="w-12 h-12 mx-auto mb-2" />
+                    <h3 class="font-display font-bold text-lg text-gray-800">Puskesmas Antang</h3>
+                    <p class="text-xs text-gray-500">Sistem Antrian Digital</p>
+                  </div>
+                  
+                  <div class="border-t border-dashed border-gray-300 my-4"></div>
+                  
                   <p class="text-sm text-gray-500 mb-2">Nomor Antrian Anda</p>
                   <div class="queue-number-display mb-4">
                     {{ ticket.nomor_antrian }}
@@ -170,26 +179,34 @@
                   <div class="grid grid-cols-2 gap-4 text-left">
                     <div class="p-4 rounded-xl bg-gray-50">
                       <p class="text-xs text-gray-500 mb-1">Waktu Daftar</p>
-                      <p class="font-display font-medium text-gray-800">
+                      <p class="font-display font-medium text-gray-800 text-sm">
                         {{ formatDate(ticket.created_at) }}
                       </p>
                     </div>
                     <div class="p-4 rounded-xl bg-gray-50">
                       <p class="text-xs text-gray-500 mb-1">Estimasi Waktu</p>
-                      <p class="font-display font-medium text-gray-800">
+                      <p class="font-display font-medium text-gray-800 text-sm">
                         ~{{ ticket.estimasi_waktu || 15 }} menit
                       </p>
                     </div>
                   </div>
+                  
+                  <div class="border-t border-dashed border-gray-300 my-4"></div>
+                  
+                  <p class="text-xs text-gray-500 text-center">
+                    Harap datang 10 menit sebelum giliran Anda
+                  </p>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-4">
+                <div class="flex flex-col sm:flex-row gap-4 no-print">
                   <button
                     @click="saveAsImage"
+                    :disabled="isSaving"
                     class="btn-primary flex-1 justify-center"
                   >
-                    <UIcon name="i-heroicons-arrow-down-tray" class="w-5 h-5" />
-                    Simpan Gambar
+                    <UIcon v-if="isSaving" name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin" />
+                    <UIcon v-else name="i-heroicons-arrow-down-tray" class="w-5 h-5" />
+                    {{ isSaving ? 'Menyimpan...' : 'Simpan Gambar' }}
                   </button>
                   <button
                     @click="printTicket"
@@ -198,6 +215,37 @@
                     <UIcon name="i-heroicons-printer" class="w-5 h-5" />
                     Cetak Tiket
                   </button>
+                </div>
+              </div>
+              
+              <!-- Print-only ticket -->
+              <div class="print-ticket hidden print:block">
+                <div class="ticket-print-container">
+                  <div class="text-center mb-4">
+                    <h2 class="font-bold text-xl">PUSKESMAS ANTANG</h2>
+                    <p class="text-sm">Sistem Antrian Digital</p>
+                  </div>
+                  
+                  <div class="border-t border-dashed border-gray-400 my-3"></div>
+                  
+                  <div class="text-center my-6">
+                    <p class="text-sm mb-1">Nomor Antrian</p>
+                    <p class="text-5xl font-bold my-2">{{ ticket.nomor_antrian }}</p>
+                    <p class="text-lg font-semibold mt-2">{{ ticket.poli_name }}</p>
+                  </div>
+                  
+                  <div class="border-t border-dashed border-gray-400 my-3"></div>
+                  
+                  <div class="text-sm space-y-1">
+                    <p><strong>Waktu:</strong> {{ formatDate(ticket.created_at) }}</p>
+                    <p><strong>Estimasi:</strong> ~{{ ticket.estimasi_waktu || 15 }} menit</p>
+                  </div>
+                  
+                  <div class="border-t border-dashed border-gray-400 my-3"></div>
+                  
+                  <p class="text-xs text-center">
+                    Harap datang 10 menit sebelum giliran
+                  </p>
                 </div>
               </div>
 
@@ -229,7 +277,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Poli, QueueTicket, ApiResponse } from '~/types'
+import type { Poli, QueueTicket } from '~/types'
 
 definePageMeta({
   layout: false,
@@ -241,6 +289,9 @@ useHead({
 
 const config = useRuntimeConfig()
 const toast = useToast()
+
+const ticketRef = ref<HTMLElement | null>(null)
+const isSaving = ref(false)
 
 const form = ref({
   nik: '',
@@ -394,12 +445,49 @@ function formatDate(dateStr: string): string {
   })
 }
 
-function saveAsImage() {
-  toast.add({
-    title: 'Info',
-    description: 'Fitur simpan gambar akan segera tersedia',
-    color: 'blue',
-  })
+async function saveAsImage() {
+  if (!ticketRef.value) {
+    toast.add({
+      title: 'Error',
+      description: 'Tidak dapat menemukan elemen tiket',
+      color: 'red',
+    })
+    return
+  }
+
+  isSaving.value = true
+
+  try {
+    const html2canvas = (await import('html2canvas')).default
+    
+    const canvas = await html2canvas(ticketRef.value, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+    })
+
+    const link = document.createElement('a')
+    link.download = `tiket-antrian-${ticket.value?.nomor_antrian || 'puskesmas'}.png`
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+
+    toast.add({
+      title: 'Berhasil',
+      description: 'Tiket berhasil disimpan sebagai gambar',
+      color: 'green',
+    })
+  } catch (error) {
+    console.error('Error saving image:', error)
+    toast.add({
+      title: 'Gagal',
+      description: 'Gagal menyimpan gambar. Coba lagi.',
+      color: 'red',
+    })
+  } finally {
+    isSaving.value = false
+  }
 }
 
 function printTicket() {
