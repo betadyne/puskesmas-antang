@@ -41,45 +41,50 @@
               <div class="absolute -bottom-10 -left-10 w-72 h-72 bg-accent-200 rounded-full blur-3xl opacity-50"></div>
 
               <div class="relative bg-white rounded-4xl p-8 shadow-2xl border border-gray-100">
-                <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center justify-between mb-6">
                   <div>
-                    <p class="text-sm text-gray-500 mb-1">Nomor Antrian Anda</p>
-                    <div class="flex items-baseline gap-2">
-                      <span class="queue-number text-primary-600">A001</span>
-                    </div>
+                    <p class="text-sm text-gray-500 mb-1">Jumlah Antrian Hari Ini</p>
+                    <p class="font-display font-bold text-2xl text-gray-800">Per Poli</p>
                   </div>
-                  <div class="w-20 h-20 rounded-2xl bg-primary-500 flex items-center justify-center shadow-glow">
-                    <UIcon name="i-heroicons-ticket" class="w-10 h-10 text-white" />
+                  <div class="w-16 h-16 rounded-2xl bg-primary-500 flex items-center justify-center shadow-glow">
+                    <UIcon name="i-heroicons-queue-list" class="w-8 h-8 text-white" />
                   </div>
                 </div>
 
-                <div class="space-y-4">
-                  <div class="flex items-center justify-between p-4 rounded-2xl bg-gray-50">
+                <div class="space-y-3 max-h-80 overflow-y-auto">
+                  <div v-if="poliStats.length === 0" class="text-center py-8 text-gray-500">
+                    <UIcon name="i-heroicons-inbox" class="w-10 h-10 mx-auto mb-2 text-gray-300" />
+                    <p class="text-sm">Memuat data...</p>
+                  </div>
+                  
+                  <div
+                    v-for="poli in poliStats"
+                    :key="poli.id"
+                    class="flex items-center justify-between p-4 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
                     <div class="flex items-center gap-3">
                       <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
-                        <UIcon name="i-heroicons-building-office-2" class="w-5 h-5 text-primary-600" />
+                        <span class="font-mono font-bold text-primary-600 text-sm">{{ poli.kode_poli }}</span>
                       </div>
-                      <span class="font-display font-medium">Poli Umum</span>
-                    </div>
-                    <span class="badge-success">Menunggu</span>
-                  </div>
-
-                  <div class="flex items-center justify-between p-4 rounded-2xl bg-gray-50">
-                    <div class="flex items-center gap-3">
-                      <div class="w-10 h-10 rounded-xl bg-accent-100 flex items-center justify-center">
-                        <UIcon name="i-heroicons-clock" class="w-5 h-5 text-accent-600" />
+                      <div>
+                        <span class="font-display font-medium text-gray-800 block">{{ poli.nama_poli }}</span>
+                        <span v-if="poli.current_queue" class="text-xs text-green-600">
+                          Sedang dilayani: {{ poli.current_queue }}
+                        </span>
                       </div>
-                      <span class="font-display font-medium">Estimasi Waktu</span>
                     </div>
-                    <span class="font-mono font-bold text-gray-700">~15 menit</span>
+                    <div class="text-right">
+                      <span class="font-mono font-bold text-2xl text-primary-600">{{ poli.waiting_count }}</span>
+                      <p class="text-xs text-gray-500">menunggu</p>
+                    </div>
                   </div>
                 </div>
 
                 <div class="mt-6 p-4 rounded-2xl bg-gradient-to-r from-primary-50 to-accent-50 border border-primary-100">
                   <div class="flex items-center gap-3">
-                    <UIcon name="i-heroicons-bell-alert" class="w-5 h-5 text-primary-600" />
+                    <UIcon name="i-heroicons-information-circle" class="w-5 h-5 text-primary-600" />
                     <p class="text-sm text-gray-700">
-                      <span class="font-semibold">Sisa antrian:</span> 3 orang di depan Anda
+                      <span class="font-semibold">Total:</span> {{ totalWaiting }} pasien menunggu
                     </p>
                   </div>
                 </div>
@@ -187,10 +192,48 @@ useHead({
   title: 'Puskesmas Antang - Sistem Antrian Online',
 })
 
+const config = useRuntimeConfig()
+
+interface PoliStat {
+  id: number
+  kode_poli: string
+  nama_poli: string
+  waiting_count: number
+  current_queue: string | null
+}
+
 const stats = ref({
   cities: 5,
   patients: 1500,
   poli: 8,
   satisfaction: 98,
+})
+
+const poliStats = ref<PoliStat[]>([])
+
+const totalWaiting = computed(() => {
+  return poliStats.value.reduce((sum, poli) => sum + poli.waiting_count, 0)
+})
+
+async function fetchPoliStats() {
+  try {
+    const response = await $fetch<{ message: string; data: PoliStat[] }>(
+      `${config.public.apiBase}/poli/queue-stats`
+    )
+    if (response.data) {
+      poliStats.value = response.data
+      stats.value.poli = response.data.length
+    }
+  } catch (error) {
+    console.error('Error fetching poli stats:', error)
+  }
+}
+
+onMounted(() => {
+  fetchPoliStats()
+  
+  // Refresh every 30 seconds
+  const interval = setInterval(fetchPoliStats, 30000)
+  onUnmounted(() => clearInterval(interval))
 })
 </script>

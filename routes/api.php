@@ -23,6 +23,34 @@ Route::get('/poli', function () {
     ]);
 });
 
+// Public poli queue stats (for landing page)
+Route::get('/poli/queue-stats', function () {
+    $polis = \App\Models\Poli::all()->map(function ($poli) {
+        $waitingCount = \App\Models\Queue::where('poli_id', $poli->id)
+            ->today()
+            ->where('status', 'menunggu')
+            ->count();
+        
+        $currentQueue = \App\Models\Queue::where('poli_id', $poli->id)
+            ->today()
+            ->where('status', 'dipanggil')
+            ->first();
+            
+        return [
+            'id' => $poli->id,
+            'kode_poli' => $poli->kode_poli,
+            'nama_poli' => $poli->nama_poli,
+            'waiting_count' => $waitingCount,
+            'current_queue' => $currentQueue ? $currentQueue->nomor_antrean : null,
+        ];
+    });
+    
+    return response()->json([
+        'message' => 'Poli queue stats retrieved successfully',
+        'data' => $polis
+    ]);
+});
+
 // Public display routes
 Route::get('/display/{poli}', [DisplayController::class, 'show']);
 Route::get('/queue/status/{nomor}', [DisplayController::class, 'checkQueueStatus']);
@@ -69,6 +97,85 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Admin only routes
     Route::middleware(['role:admin'])->prefix('/admin')->group(function () {
+        // Admin dashboard stats
+        Route::get('/stats', function () {
+            $today = today()->format('Y-m-d');
+            
+            // Total patients
+            $totalPatients = \App\Models\Patient::count();
+            
+            // Total poli
+            $totalPoli = \App\Models\Poli::count();
+            
+            // Total users (petugas + admin)
+            $totalUsers = \App\Models\User::count();
+            
+            // Today's served queues
+            $todayServed = \App\Models\Queue::whereHas('registration', function ($q) use ($today) {
+                $q->where('tanggal_daftar', $today);
+            })->where('status', 'selesai')->count();
+            
+            // Today's waiting queues
+            $todayWaiting = \App\Models\Queue::whereHas('registration', function ($q) use ($today) {
+                $q->where('tanggal_daftar', $today);
+            })->where('status', 'menunggu')->count();
+            
+            // Today's total queues
+            $todayTotal = \App\Models\Queue::whereHas('registration', function ($q) use ($today) {
+                $q->where('tanggal_daftar', $today);
+            })->count();
+            
+            // Recent activities (today's queues)
+            $recentQueues = \App\Models\Queue::with(['registration.patient', 'poli'])
+                ->whereHas('registration', function ($q) use ($today) {
+                    $q->where('tanggal_daftar', $today);
+                })
+                ->orderBy('updated_at', 'desc')
+                ->limit(10)
+                ->get()
+                ->map(function ($queue) {
+                    $type = 'queue';
+                    $message = '';
+                    
+                    switch ($queue->status) {
+                        case 'menunggu':
+                            $message = "Pasien {$queue->registration->patient->nama} mendaftar ke {$queue->poli->nama_poli}";
+                            break;
+                        case 'dipanggil':
+                            $message = "Antrian {$queue->nomor_antrean} dipanggil di {$queue->poli->nama_poli}";
+                            break;
+                        case 'selesai':
+                            $message = "Antrian {$queue->nomor_antrean} selesai dilayani";
+                            break;
+                        case 'dilewati':
+                            $message = "Antrian {$queue->nomor_antrean} dilewati";
+                            break;
+                        default:
+                            $message = "Antrian {$queue->nomor_antrean} - {$queue->status}";
+                    }
+                    
+                    return [
+                        'id' => $queue->id,
+                        'type' => $type,
+                        'message' => $message,
+                        'time' => $queue->updated_at->format('H:i'),
+                    ];
+                });
+            
+            return response()->json([
+                'message' => 'Admin stats retrieved successfully',
+                'data' => [
+                    'total_patients' => $totalPatients,
+                    'total_poli' => $totalPoli,
+                    'total_users' => $totalUsers,
+                    'today_served' => $todayServed,
+                    'today_waiting' => $todayWaiting,
+                    'today_total' => $todayTotal,
+                    'recent_activities' => $recentQueues,
+                ]
+            ]);
+        });
+        
         // User management
         Route::apiResource('/users', UserController::class);
         

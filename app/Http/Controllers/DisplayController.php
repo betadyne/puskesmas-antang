@@ -71,7 +71,7 @@ class DisplayController extends Controller
      */
     public function checkQueueStatus(Request $request, $nomor)
     {
-        $queue = Queue::with(['registration.patient', 'poli'])
+        $queue = Queue::with(['registration.patient', 'poli', 'petugas'])
             ->where('nomor_antrean', $nomor)
             ->today()
             ->first();

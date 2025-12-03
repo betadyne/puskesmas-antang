@@ -85,6 +85,16 @@
                   </div>
                 </div>
 
+                <div v-if="queue.petugas" class="p-4 rounded-xl bg-blue-50 border border-blue-100 mb-6">
+                  <div class="flex items-center gap-2 mb-2">
+                    <UIcon name="i-heroicons-user-circle" class="w-4 h-4 text-blue-500" />
+                    <span class="text-xs text-blue-600">Dokter</span>
+                  </div>
+                  <p class="font-display font-semibold text-blue-800">
+                    {{ queue.petugas.name }}
+                  </p>
+                </div>
+
                 <div v-if="queue.status === 'menunggu'" class="p-4 rounded-xl bg-primary-50 border border-primary-100">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">

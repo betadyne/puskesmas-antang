@@ -45,6 +45,16 @@
             </div>
 
             <NuxtLink
+              to="/admin"
+              class="sidebar-link"
+              active-class="sidebar-link-active"
+              :class="{ 'sidebar-link-active': route.path === '/admin' }"
+            >
+              <UIcon name="i-heroicons-squares-2x2" class="w-5 h-5" />
+              <span>Dashboard Admin</span>
+            </NuxtLink>
+
+            <NuxtLink
               to="/admin/users"
               class="sidebar-link"
               active-class="sidebar-link-active"
@@ -161,6 +171,7 @@ const pageTitle = computed(() => {
   const titles: Record<string, string> = {
     '/dashboard': 'Manajemen Antrian',
     '/dashboard/reports': 'Laporan & Statistik',
+    '/admin': 'Dashboard Admin',
     '/admin/users': 'Kelola Pengguna',
     '/admin/poli': 'Kelola Poli',
     '/admin/patients': 'Data Pasien',
